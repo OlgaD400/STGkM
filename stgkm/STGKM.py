@@ -51,7 +51,7 @@ def agglomerative_clustering(
     """Find final long term cluster labels using agglomerative clustering"""
     criteria_mat = similarity_matrix(weights, similarity_function=similarity_function)
     model = AgglomerativeClustering(
-        n_clusters=num_clusters, linkage="average", affinity="precomputed"
+        n_clusters=num_clusters, linkage="average", metric="precomputed"
     )
     model.fit(1 - criteria_mat)
 
