@@ -59,11 +59,9 @@ def get_reddit_df(
 
 
 # in_filepath = "data/soc-redditHyperlinks-title.tsv"
-# out_filepath = "Reddit_loaded_data/reddit_df.pkl"
+OUT_FILEPATH = "loaded_data/Reddit_loaded_data/reddit_df.pkl"
 
-fin_df = get_reddit_df(
-    out_filepath="Reddit_loaded_data/reddit_df.pkl", sentiment="positive"
-)
+fin_df = get_reddit_df(out_filepath=OUT_FILEPATH, sentiment=SENTIMENT)
 
 # og_df = pd.read_pickle("Reddit_loaded_data/reddit_df.pkl")
 # og_df["YEAR"] = og_df["TIMESTAMP"].dt.year
@@ -82,10 +80,10 @@ def load_reddit_connectivity_matrix(out_folder: str, sentiment: str):
     """
     Load reddit connectivity matrix and connection weights.
     """
-    if SENTIMENT == "positive":
+    if sentiment == "positive":
         connectivity_matrix = np.load(out_folder + "/reddit_connectivity_positive.npy")
         weight_matrix = np.load(out_folder + "/reddit_weight_positive.npy")
-    elif SENTIMENT == "negative":
+    elif sentiment == "negative":
         connectivity_matrix = np.load(out_folder + "/reddit_connectivity_negative.npy")
         weight_matrix = np.load(out_folder + "/reddit_weight_negative.npy")
     return connectivity_matrix, weight_matrix
