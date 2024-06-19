@@ -1,6 +1,7 @@
+"""Helper functions for running STGkM."""
+
 import numpy as np
 import kmedoids
-from sklearn.preprocessing import LabelBinarizer
 from stgkm.STGKM import STGKM
 from stgkm.distance_functions import s_journey
 from stgkm.STGKM import agglomerative_clustering
@@ -10,9 +11,11 @@ def penalize_distance(distance_matrix: np.ndarray, penalty: float) -> np.ndarray
     """
     Penalize the distance matrix, to make infinite journies finite.
 
-    Args:
+    Inputs:
         distance_matrix (np.ndarray): Array storing distances between pairs of vertices.
         penalty (float): Finite penalty assigned to vertices with infinite distance.
+    Returns:
+        (np.ndarray) Penalized distance matrix.
     """
     penalized_distance = np.where(distance_matrix == np.inf, penalty, distance_matrix)
     return penalized_distance
@@ -98,7 +101,7 @@ def choose_num_clusters_og(
     tie_breaker=False,
 ):
     """
-    Function for choosing the optimal number of clusters.
+    Function for choosing the optimal number of clusters based on original STGkM implementation.
 
     Must be run for a "reasonable" number of clusters or minimum will
     be when all points are their own cluster centers.
@@ -161,7 +164,7 @@ def choose_num_clusters(
     medoid_selection: str = "connectivity",
 ):
     """
-    Function for choosing the optimal number of clusters.
+    Function for choosing the optimal number of clusters using STGkM based on k-medoids FasterPAM implementation.
 
     Must be run for a "reasonable" number of clusters or minimum will
     be when all points are their own cluster centers.
@@ -203,11 +206,6 @@ def choose_num_clusters(
             random_state=random_state,
         )
         result = stgkm.fit(penalized_distance)
-        # obj_value = calculate_objective(
-        #     result.medoid_indices_,
-        #     labels=result.labels_,
-        #     penalized_distance=penalized_distance,
-        # )
 
         obj_value = calculate_silhouette(
             medoids=result.medoid_indices_, penalized_distance=penalized_distance
@@ -246,7 +244,10 @@ def calculate_objective(
     return obj_sum
 
 
-def calculate_silhouette(medoids, penalized_distance):
+def calculate_silhouette(medoids: np.ndarray, penalized_distance: np.ndarray):
+    """
+    Calculate the average silhouette score for a given set of chosen medoids."""
+
     timesteps, _, _ = penalized_distance.shape
 
     s_scores = []

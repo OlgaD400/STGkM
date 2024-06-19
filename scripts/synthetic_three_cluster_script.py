@@ -3,10 +3,9 @@
 import numpy as np
 import kmedoids
 from stgkm.distance_functions import s_journey
-from stgkm_figures import (
+from stgkm.stgkm_figures import (
     three_snapshots_dynamic_clustering,
     choosing_num_clusters_plot,
-    visualize_graph,
 )
 from stgkm.STGKM import agglomerative_clustering
 from stgkm.synthetic_graphs import ThreeClusterConnectivity
@@ -34,21 +33,6 @@ PENALTY = 8
 
 penalized_distance = np.where(distance_matrix == np.inf, PENALTY, distance_matrix)
 
-
-km = kmedoids.KMedoids(
-    3,
-    method="fasterpam_time",
-    max_drift=1,
-    drift_time_window=1,
-    max_iter=1000,
-    random_state=1,
-    online=False,
-)
-c = km.fit(penalized_distance)
-opt_labels = c.labels_
-opt_medoids = c.medoid_indices_
-opt_k = 3
-
 obj_values, opt_k, label_history, medoid_history = choose_num_clusters(
     min_clusters=MIN_CLUSTERS,
     max_clusters=MAX_CLUSTERS,
@@ -61,22 +45,29 @@ obj_values, opt_k, label_history, medoid_history = choose_num_clusters(
     medoid_selection="num",
 )
 
+km = kmedoids.KMedoids(
+    opt_k,
+    method="fasterpam_time",
+    max_drift=1,
+    drift_time_window=1,
+    max_iter=1000,
+    random_state=1,
+    online=False,
+)
+c = km.fit(penalized_distance)
+opt_labels = c.labels_
+opt_medoids = c.medoid_indices_
+
 opt_ltc = agglomerative_clustering(weights=opt_labels.T, num_clusters=opt_k)
 print("k: ", opt_k)
-
-visualize_graph(
-    connectivity_matrix=three_cluster_connectivity_matrix[0][np.newaxis, :, :],
-    labels=c.labels_,
-    centers=c.medoid_indices_,
-)
 
 ## Visualize three snapshots of the dynamic graph ###
 three_snapshots_dynamic_clustering(
     timesteps=[0, 1, 2],
-    membership=opt_labels,  # stgkm.full_assignments,
+    membership=opt_labels,
     num_clusters=3,
     connectivity_matrix=three_cluster_connectivity_matrix,
-    centers=opt_medoids,  # stgkm.full_centers,
+    centers=opt_medoids,
     fig_title="Cluster Evolution",
     snapshot_title="Timestep ",
     filepath="Synthetic_cluster_evolution.pdf",

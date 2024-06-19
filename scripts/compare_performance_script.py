@@ -7,7 +7,7 @@ from stgkm.synthetic_graphs import (
     ThreeClusterConnectivity,
     TheseusClique,
 )
-from stgkm_figures import plot_cluster_history
+from stgkm.stgkm_figures import plot_cluster_history
 from compare_performance import compare_performance
 
 PLOT = True

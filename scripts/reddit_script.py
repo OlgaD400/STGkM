@@ -1,28 +1,17 @@
+"""Script for running experiments on the Reddit dataset."""
+
+import os
 import numpy as np
 import pandas as pd
-from stgkm.distance_functions import s_journey
-import kmedoids
 import matplotlib.pyplot as plt
-from stgkm.helper_functions import (
-    calculate_cluster_connectivity,
-    return_avg_cluster_connectivity,
-    choose_num_clusters,
-)
-from stgkm.STGKM import (
-    STGKM,
-    similarity_matrix,
-    similarity_measure,
-    agglomerative_clustering,
-)
-from stgkm_figures import (
+from typing import Optional
+from stgkm.distance_functions import s_journey
+from stgkm.helper_functions import choose_num_clusters
+from stgkm.STGKM import agglomerative_clustering
+from stgkm.stgkm_figures import (
     similarity_matrix_figure,
     choosing_num_clusters_plot,
-    community_matrix_figure,
 )
-import os
-from typing import Optional
-
-SENTIMENT = "positive"
 
 
 def get_reddit_df(
@@ -58,24 +47,6 @@ def get_reddit_df(
     return fin_df
 
 
-# in_filepath = "data/soc-redditHyperlinks-title.tsv"
-OUT_FILEPATH = "loaded_data/Reddit_loaded_data/reddit_df.pkl"
-
-fin_df = get_reddit_df(out_filepath=OUT_FILEPATH, sentiment=SENTIMENT)
-
-# og_df = pd.read_pickle("Reddit_loaded_data/reddit_df.pkl")
-# og_df["YEAR"] = og_df["TIMESTAMP"].dt.year
-# og_df["MONTH"] = og_df["TIMESTAMP"].dt.month
-# pos_df = og_df[
-#     (og_df["LINK_SENTIMENT"] == 1) & (og_df["YEAR"] == 2015) & (og_df["MONTH"] == 2)
-# ]
-# if SENTIMENT == "positive":
-#     pos_df = og_df[og_df["LINK_SENTIMENT"] == 1]
-# elif SENTIMENT == "negative":
-#     pos_df = og_df[og_df["LINK_SENTIMENT"] == -1]
-# pos_df["DATE"] = pos_df["TIMESTAMP"].dt.to_period("M")
-
-
 def load_reddit_connectivity_matrix(out_folder: str, sentiment: str):
     """
     Load reddit connectivity matrix and connection weights.
@@ -103,32 +74,29 @@ def create_reddit_connectivity_matrix(
     connectivity_matrix = np.zeros((timestamps, len(subreddits), len(subreddits)))
     weight_matrix = np.ones((timestamps, len(subreddits), len(subreddits)))
 
-    for index, row in reddit_df.iterrows():
+    for _, row in reddit_df.iterrows():
         source = row["SOURCE_SUBREDDIT"]
         target = row["TARGET_SUBREDDIT"]
 
         if (source in subreddits) & (target in subreddits):
             time = date_dict[row["DATE"]]
-            V_A = subreddit_dict[source]
-            V_B = subreddit_dict[target]
-            connectivity_matrix[time, V_A, V_B] = 1
-            connectivity_matrix[time, V_B, V_A] = 1
-            weight_matrix[time, V_A, V_B] += 1
-            weight_matrix[time, V_B, V_A] += 1
+            Va = subreddit_dict[source]
+            Vb = subreddit_dict[target]
+            connectivity_matrix[time, Va, Vb] = 1
+            connectivity_matrix[time, Vb, Va] = 1
+            weight_matrix[time, Va, Vb] += 1
+            weight_matrix[time, Vb, Va] += 1
     ##########################
     np.save(
         out_folder + "/reddit_connectivity_" + sentiment + ".npy", connectivity_matrix
     )
     np.save(out_folder + "/reddit_weight_" + sentiment + ".npy", weight_matrix)
     print("matrices created")
-    return None
+    return connectivity_matrix, weight_matrix
 
 
-def get_reddit_connectivity_matrix(sentiment: str, fin_df):
+def get_reddit_connectivity_matrix(sentiment: str, fin_df, out_folder):
     "Get the reddit connectivity_matrix. Create it if it doesn't exist. Load it if it does."
-
-    # unique_dates = np.sort(fin_df["DATE"].unique())
-    # date_dict = dict(zip(unique_dates, np.arange(len(unique_dates))))
 
     ########### EXTRACT SOURCE TARGET PAIRS ####################
     source_vc = fin_df["SOURCE_SUBREDDIT"].value_counts()
@@ -145,52 +113,34 @@ def get_reddit_connectivity_matrix(sentiment: str, fin_df):
 
     subreddits = np.intersect1d(source_reddits, source_target_threshold)
 
+    index_to_subreddit = dict(zip(np.arange(len(subreddits)), subreddits))
+
     ##########################################################
     if not os.path.isfile(
         out_folder + "/reddit_connectivity_" + sentiment + ".npy",
     ):
-        create_reddit_connectivity_matrix(
-            reddit_df=fin_df, subreddits=subreddits, out_folder="Reddit_loaded_data"
+        connectivity_matrix, weight_matrix = create_reddit_connectivity_matrix(
+            sentiment=sentiment,
+            reddit_df=fin_df,
+            subreddits=subreddits,
+            out_folder="Reddit_loaded_data",
         )
     else:
-        load_reddit_connectivity_matrix(out_folder, sentiment=sentiment)
+        connectivity_matrix, weight_matrix = load_reddit_connectivity_matrix(
+            out_folder, sentiment=sentiment
+        )
+    return connectivity_matrix, weight_matrix, index_to_subreddit
 
-    # subreddit_dict = dict(zip(subreddits, np.arange(len(subreddits))))
-    index_to_subreddit = dict(zip(np.arange(len(subreddits)), subreddits))
-    # timestamps = len(fin_df["DATE"].unique())
 
-    # connectivity_matrix = np.zeros((timestamps, len(subreddits), len(subreddits)))
-    # weight_matrix = np.ones((timestamps, len(subreddits), len(subreddits)))
+# in_filepath = "data/soc-redditHyperlinks-title.tsv"
+SENTIMENT = "positive"
+OUT_FILEPATH = "loaded_data/Reddit_loaded_data/reddit_df.pkl"
+OUT_FOLDER = "loaded_data/Reddit_loaded_data"
 
-    # for index, row in pos_df.iterrows():
-    #     source = row["SOURCE_SUBREDDIT"]
-    #     target = row["TARGET_SUBREDDIT"]
-
-    #     if (source in subreddits) & (target in subreddits):
-    #         time = date_dict[row["DATE"]]
-    #         V_A = subreddit_dict[source]
-    #         V_B = subreddit_dict[target]
-    #         connectivity_matrix[time, V_A, V_B] = 1
-    #         connectivity_matrix[time, V_B, V_A] = 1
-    #         weight_matrix[time, V_A, V_B] += 1
-    #         weight_matrix[time, V_B, V_A] += 1
-
-    ###########################
-    # np.save("reddit_connectivity_negative.npy", connectivity_matrix)
-    # np.save("reddit_weight_negative.npy", weight_matrix)
-    # print("matrices created")
-
-    # if SENTIMENT == "positive":
-    #     connectivity_matrix = np.load(
-    #         "Reddit_loaded_data/reddit_connectivity_positive.npy"
-    #     )
-    #     weight_matrix = np.load("Reddit_loaded_data/reddit_weight_positive.npy")
-    # elif SENTIMENT == "negative":
-    #     connectivity_matrix = np.load(
-    #         "Reddit_loaded_data/reddit_connectivity_negative.npy"
-    #     )
-    #     weight_matrix = np.load("Reddit_loaded_data/reddit_weight_negative.npy")
-
+FIN_DF = get_reddit_df(out_filepath=OUT_FILEPATH, sentiment=SENTIMENT)
+CONNECTIVITY_MATRIX, WEIGHT_MATRIX, INDEX_TO_SUBREDDIT = get_reddit_connectivity_matrix(
+    sentiment=SENTIMENT, fin_df=FIN_DF, out_folder=OUT_FOLDER
+)
 
 # # # calculate s_journey
 MAX_DRIFT = 1
@@ -210,15 +160,12 @@ STR_ID = (
     + "_TEMP"
 )
 
-
-t, num_vertices, _ = connectivity_matrix.shape
+t, num_vertices, _ = CONNECTIVITY_MATRIX.shape
 PENALTY = t + END
 
-
-distance_matrix = s_journey(connectivity_matrix)
-
+distance_matrix = s_journey(CONNECTIVITY_MATRIX)
 penalized_distance = np.where(distance_matrix == np.inf, PENALTY, distance_matrix)
-penalized_distance = 1 / weight_matrix * penalized_distance
+penalized_distance = 1 / WEIGHT_MATRIX * penalized_distance
 
 random_state = np.random.choice(100, 1)[0]
 
@@ -226,7 +173,7 @@ obj_values, opt_k, label_history, medoid_history = choose_num_clusters(
     min_clusters=MIN_CLUSTERS,
     max_clusters=MAX_CLUSTERS,
     penalized_distance=penalized_distance[START:END],
-    connectivity_matrix=connectivity_matrix[START:],
+    connectivity_matrix=CONNECTIVITY_MATRIX[START:],
     random_state=random_state,
     max_drift=MAX_DRIFT,
     drift_time_window=DRIFT_TIME_WINDOW,
@@ -236,9 +183,6 @@ obj_values, opt_k, label_history, medoid_history = choose_num_clusters(
 print(opt_k)
 opt_labels = label_history[np.argmax(obj_values)]
 opt_ltc = agglomerative_clustering(weights=opt_labels.T, num_clusters=opt_k)
-# for i in range(opt_k):
-#     ind = np.where(opt_ltc == i)[0]
-#     print([rev_user_dict[index] for index in ind], "\n\n")
 
 similarity_matrix_figure(
     full_assignments=opt_labels,
@@ -254,7 +198,7 @@ choosing_num_clusters_plot(
     sum_distance_from_centers=obj_values,
     fig_title="Avg. Silhouette Score vs. Number of Clusters",
     ylabel="Avg. Silhouette Score",
-    filepath="Reddit_figures/Reddit_opt_num_clusters" + STR_ID + ".pdf",
+    filepath="STGKM_Figures/Reddit_opt_num_clusters" + STR_ID + ".pdf",
 )
 
 ########### PURITY HISTOGRAM
@@ -272,14 +216,17 @@ axs.set_ylabel("Count", fontsize=50)
 axs.axvline(np.average(purity), color="r", linestyle="dashed", linewidth=4)
 axs.set_xlabel("Number of Clusters", fontsize=50)
 axs.tick_params(labelsize=30)
-plt.savefig("Reddit_cluster_membership_hist" + STR_ID + ".pdf", format="pdf")
+plt.savefig(
+    "STGKM_Figures/Reddit_cluster_membership_hist" + STR_ID + ".pdf", format="pdf"
+)
 
 ###############################################
+# Long term cluster membership
 for i in range(opt_k):
     mems = np.where(opt_ltc == i)[0]
-    print([index_to_subreddit[index] for index in mems])
+    print([INDEX_TO_SUBREDDIT[index] for index in mems])
 
-
+# Most popular (how often they appear over time) topics in each short term cluster
 for i in range(opt_k):
     member_ind = np.where(opt_labels == i)[1]
     num_clustered = len(member_ind)
@@ -289,12 +236,13 @@ for i in range(opt_k):
     arg_sorted_counts = np.argsort(counts)[::-1]
     sorted_counts = np.sort(counts)[::-1]
     print(sorted_counts)
-    print([index_to_subreddit[index] for index in vals[arg_sorted_counts]])
+    print([INDEX_TO_SUBREDDIT[index] for index in vals[arg_sorted_counts]])
 
-
-saved_labels = np.save("Reddit_loaded_data/Reddit_opt_labels_" + STR_ID, opt_labels)
+saved_labels = np.save(
+    "loaded_data/Reddit_loaded_data/Reddit_opt_labels_" + STR_ID, opt_labels
+)
 saved_medoids = np.save(
-    "Reddit_loaded_data/Reddit_opt_medoids" + STR_ID,
+    "loaded_data/Reddit_loaded_data/Reddit_opt_medoids" + STR_ID,
     medoid_history[np.argmin(obj_values)],
 )
-saved_ltc = np.save("Reddit_loaded_data/Reddit_opt_ltc_" + STR_ID, opt_ltc)
+saved_ltc = np.save("loaded_data/Reddit_loaded_data/Reddit_opt_ltc_" + STR_ID, opt_ltc)
