@@ -9,8 +9,10 @@ This repository implements Spatiotemporal Graph k-Means (STGkM) and provides scr
 * stgkm/STGKM.py: Implementation of Spatiotemporal Graph k-Means (STGkM).
 * stgkm/distance_functions.py: Implementation of s-journey, as described in the related paper.
 * stgkm/graph_visualization.py: Code to visualize an evolving dynamic graph.
+* stgkm/helper_functions.py: Helpful functions for running STGkM.
+* stgkm/synthetic_graphs.py: Contains classes for all syntehtic graphs.
 * tests/tests.py: Contains tests for STGkM.
-* stgkm_figures.py: Contains functions for generating all visualizations from experiments. 
+* stgkm_figures.py: Contains functions for generating all visualizations from experiments.
 
 ## Scripts
 * clique_cross_clique_script.py: Script for clique-cross-clique experiments.
