@@ -23,6 +23,7 @@ This repository implements Spatiotemporal Graph k-Means (STGkM) and provides scr
 * semantic_scholar_script.py: Script to run STGkM on semantic scholar data.
 * synthetic_three_cluster_script.py: Script to run STGkM on synthetic three cluster dataset.
 * synthetic_two_cluster_script.py: Script to run STGkM on synthetic two cluster dataset.
+* theseus_clique_script.py: Script to run STGkM on theseus clique.
   
 
 
