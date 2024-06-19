@@ -13,8 +13,12 @@ This repository implements Spatiotemporal Graph k-Means (STGkM) and provides scr
 * stgkm_figures.py: Contains functions for generating all visualizations from experiments. 
 
 ## Scripts
-* roll_call_data.py: Script to get data directly from the House of Representatives website and form dataframes.
-* roll_call_data_clustering.py: Script to run STGkM on roll call dataset.
+* clique_cross_clique_script.py: Script for clique-cross-clique experiments.
+* compare_performance_script.py: Script for comparing the performance of different vertex clustering methods across various synthetic datasets.
+* reddit_script.py: Script for running STGkM on reddit data.
+* roll_call_data_creation_cript.py: Script to get data directly from the House of Representatives website and form dataframes.
+* roll_call_data_clustering_script.py: Script to run STGkM on roll call dataset.
+* semantic_scholar_script.py: Script to run STGkM on semantic scholar data.
 * synthetic_three_cluster_script.py: Script to run STGkM on synthetic three cluster dataset.
 * synthetic_two_cluster_script.py: Script to run STGkM on synthetic two cluster dataset.
   
