@@ -2,7 +2,7 @@
 We introduce _Spatiotemporal Graph k-means_ (STGkM), a novel, unsupervised method to cluster vertices within a dynamic network. Drawing inspiration from traditional k-means, STGkM finds both short-term dynamic clusters and a ``long-lived'' partitioning of vertices within a network whose topology is evolving over time. One of the main advantages of STGkM is that it has only one required parameter, namely k; we therefore include an analysis of the range of this parameter and guidance on selecting its optimal value.
 
 ## Repository Description
-This repository implements Spatiotemporal Graph k-Means (STGkM) and provides scripts that run EPCA on synthetic and real datasets.
+This repository implements Spatiotemporal Graph k-Means (STGkM) and provides scripts that run the method on synthetic and real datasets.
 
 In order to run the code, you must first fork the following repository: https://github.com/OlgaD400/python-kmedoids. You will also have to have Cargo (rust programming language) installed. Then, run the following to compile the k-medoids package from source. 
 
