@@ -9,7 +9,7 @@ from stgkm.stgkm_figures import (
     similarity_matrix_figure,
 )
 from stgkm.helper_functions import choose_num_clusters
-from stgkm.STGKM import agglomerative_clustering
+from stgkm.helper_functions import agglomerative_clustering
 
 ### Load Data ###
 final_voter_data = pd.read_csv("data/final_voter_data.csv")

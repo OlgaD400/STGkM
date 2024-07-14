@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from typing import Optional
 from stgkm.distance_functions import s_journey
 from stgkm.helper_functions import choose_num_clusters
-from stgkm.STGKM import agglomerative_clustering
+from stgkm.helper_functions import agglomerative_clustering
 from stgkm.stgkm_figures import (
     similarity_matrix_figure,
     choosing_num_clusters_plot,

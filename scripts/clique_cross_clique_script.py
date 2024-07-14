@@ -10,7 +10,7 @@ from stgkm.stgkm_figures import plot_expectation_heatmap
 
 NUM_TIMESTEPS = 10
 NUM_CLUSTERS = 3
-NUM_MEMBERS = 10
+NUM_MEMBERS = 5
 P_INTRA = 0.3
 P_INTER = 0.2
 
