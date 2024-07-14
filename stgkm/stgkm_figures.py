@@ -8,7 +8,7 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from stgkm.STGKM import STGKM, similarity_matrix, similarity_measure
+from stgkm.helper_functions import similarity_matrix, similarity_measure
 
 
 def visualize_graph(
@@ -96,73 +96,6 @@ def visualize_graph(
                 )
 
         plt.show()
-
-
-def choosing_num_clusters(
-    min_clusters: int,
-    max_clusters: int,
-    distance_matrix: np.ndarray,
-    penalty: int,
-    max_drift: int,
-    drift_time_window: np.ndarray,
-    tie_breaker: bool,
-    max_iterations: int,
-):
-    """
-    Function for choosing the optimal number of clusters.
-
-    Must be run for a "reasonable" number of clusters or minimum will
-    be when all points are their own cluster centers.
-
-    Args:
-        min_clusters (int): Minimum number of clusters to test
-        max_clusters (int): Maximum number of clusters to test
-        distance_matrix (np.ndarray): Distance between all pairs of vertices
-        penalty (float): Penalty to assign to disconnected vertices during pre-processing.
-        max_drift (int): Maximum distance between cluster centers over time.
-        drift_time_window (int): Number of timesteps centers must remain within max_drift
-            of one another.
-        tie_breaker (bool): Whether to force unique vertex assignment.
-        max_iterations (int): Maximum number of iterations for each run of stgkm.
-    Returns:
-        sum_distance_from_centers (List): List containing total sum distance of points from
-            their cluster centers for each value of k.
-    """
-    sum_distance_from_centers = []
-    times, _, _ = distance_matrix.shape
-    for num_clusters in range(min_clusters, max_clusters):
-        stgkm = STGKM(
-            distance_matrix=distance_matrix,
-            penalty=penalty,
-            max_drift=max_drift,
-            drift_time_window=drift_time_window,
-            num_clusters=num_clusters,
-            tie_breaker=tie_breaker,
-            iterations=max_iterations,
-        )
-        penalized_distance = stgkm.penalize_distance()
-        stgkm.run_stgkm(method="proxy")
-
-        total_cluster_sum = 0
-        for time in range(times):
-            centers = stgkm.full_centers[time].astype(int)
-            intra_cluster_distances = np.sum(
-                np.where(
-                    stgkm.full_assignments[
-                        time * num_clusters : time * num_clusters + num_clusters
-                    ]
-                    == 1,
-                    penalized_distance[time, centers, :],
-                    0,
-                )
-            )
-
-            total_cluster_sum += intra_cluster_distances
-
-        sum_distance_from_centers.append(total_cluster_sum)
-
-    return sum_distance_from_centers
-
 
 def choosing_num_clusters_plot(
     min_num_clusters: int,
