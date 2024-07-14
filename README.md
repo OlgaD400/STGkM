@@ -12,7 +12,8 @@ pip install maturin
 git clone https://github.com/kno10/python-kmedoids.git
 cd python-kmedoids
 # build and install the package:
-maturin develop --release```
+maturin develop --release
+```
 
 
 ## Files 
