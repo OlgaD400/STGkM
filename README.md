@@ -7,12 +7,12 @@ This repository implements Spatiotemporal Graph k-Means (STGkM) and provides scr
 
 In order to run the code, you must first fork the following repository: https://github.com/OlgaD400/python-kmedoids. You will also have to have Cargo (rust programming language) installed. Then, run the following to compile the k-medoids package from source. 
 
-""" # activate your desired virtual environment first
+```# activate your desired virtual environment first
 pip install maturin
 git clone https://github.com/kno10/python-kmedoids.git
 cd python-kmedoids
 # build and install the package:
-maturin develop --release"""
+maturin develop --release```
 
 
 ## Files 
