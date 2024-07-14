@@ -3,9 +3,9 @@
 import numpy as np
 import kmedoids
 from typing import Callable
-from stgkm.STGKM import STGKM
 from stgkm.distance_functions import s_journey
 from sklearn.cluster import AgglomerativeClustering
+from sklearn.metrics import pairwise_distances
 
 
 def similarity_measure(vector_1: np.ndarray, vector_2: np.ndarray) -> float:
@@ -139,69 +139,6 @@ def return_avg_cluster_connectivity(
     return np.average(intra_cluster_similarities, axis=1), np.average(
         inter_cluster_similarities, axis=1
     )
-
-
-def choose_num_clusters_og(
-    min_clusters: int,
-    max_clusters: int,
-    distance_matrix: np.ndarray,
-    max_drift: int,
-    drift_time_window: np.ndarray,
-    max_iterations: int,
-    penalty: int,
-    method: str,
-    tie_breaker=False,
-):
-    """
-    Function for choosing the optimal number of clusters based on original STGkM implementation.
-
-    Must be run for a "reasonable" number of clusters or minimum will
-    be when all points are their own cluster centers.
-
-    Args:
-        min_clusters (int): Minimum number of clusters to test
-        max_clusters (int): Maximum number of clusters to test
-        distance_matrix (np.ndarray): Distance between all pairs of vertices
-        penalty (float): Penalty to assign to disconnected vertices during pre-processing.
-        max_drift (int): Maximum distance between cluster centers over time.
-        drift_time_window (int): Number of timesteps centers must remain within max_drift
-            of one another.
-        max_iterations (int): Maximum number of iterations for each run of stgkm.
-    Returns:
-        sum_distance_from_centers (List): List containing total sum distance of points from
-            their cluster centers for each value of k.
-    """
-    obj_values = []
-    label_history = []
-    medoid_history = []
-
-    k_range = range(min_clusters, max_clusters)
-
-    for num_clusters in k_range:
-        stgkm = STGKM(
-            distance_matrix=distance_matrix,
-            penalty=penalty,
-            max_drift=max_drift,
-            drift_time_window=drift_time_window,
-            num_clusters=num_clusters,
-            tie_breaker=tie_breaker,
-            iterations=max_iterations,
-        )
-        stgkm.run_stgkm(method=method)
-
-        penalized_distance = stgkm.penalize_distance()
-
-        obj_value = calculate_objective(
-            stgkm.full_centers,
-            labels=stgkm.full_assignments,
-            penalized_distance=penalized_distance,
-        )
-
-        obj_values.append(obj_value)
-        label_history.append(stgkm.full_assignments)
-        medoid_history.append(stgkm.full_centers)
-
-    return obj_values, k_range[np.argmin(obj_values)], label_history, medoid_history
 
 
 def choose_num_clusters(
