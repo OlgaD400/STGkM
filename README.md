@@ -4,7 +4,7 @@ We introduce _Spatiotemporal Graph k-means_ (STGkM), a novel, unsupervised metho
 ## Repository Description
 This repository implements Spatiotemporal Graph k-Means (STGkM) and provides scripts that run the method on synthetic and real datasets.
 
-In order to run the code, you must first fork the following repository: https://github.com/OlgaD400/python-kmedoids. You will also have to have Cargo (rust programming language) installed. Then, run the following to compile the k-medoids package from source. 
+STGkM is implemented as an extension of the Rust k-medoids package. In order to run the code, you must first fork the following repository: https://github.com/OlgaD400/python-kmedoids. You will also have to have Cargo (rust programming language) installed. Then, run the following to compile the k-medoids package from source. 
 
 ```# activate your desired virtual environment first
 pip install maturin
@@ -15,7 +15,6 @@ maturin develop --release
 ```
 
 ## Files 
-* stgkm/STGKM.py: Implementation of Spatiotemporal Graph k-Means (STGkM).
 * stgkm/distance_functions.py: Implementation of s-journey, as described in the related paper.
 * stgkm/graph_visualization.py: Code to visualize an evolving dynamic graph.
 * stgkm/helper_functions.py: Helpful functions for running STGkM.
