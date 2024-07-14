@@ -21,6 +21,7 @@ maturin develop --release
 * stgkm/synthetic_graphs.py: Contains classes for all syntehtic graphs.
 * tests/tests.py: Contains tests for STGkM.
 * stgkm_figures.py: Contains functions for generating all visualizations from experiments.
+* DCDID/: Contains files for running DCDID (dynamic community detection based on information dynamics)
 
 ## Scripts
 * clique_cross_clique_script.py: Script for clique-cross-clique experiments.
