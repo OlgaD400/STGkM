@@ -76,22 +76,27 @@ class CliqueCrossClique:
         for time in range(3):
             graph = nx.from_numpy_array(self.connectivity_matrix[time])
 
+            # Remove self loops from the figure for improved readability
+            graph.remove_edges_from(nx.selfloop_edges(graph))
+
             if time == 0:
                 pos = nx.spring_layout(graph)
 
             nx.draw(
                 graph,
-                with_labels=False,
+                with_labels=True,
                 node_color=[color_dict[label] for label in labels],
-                node_size=np.ones(self.num_members * self.num_clusters) * 500,
+                font_size=35,
+                node_size=np.ones(self.num_members * self.num_clusters) * 2000,
                 pos=pos,
                 ax=axs[time % 3],
             )
+
             axs[time % 3].set_title("Timestep %i" % time, size=100)
 
         plt.tight_layout()
         if filepath is not None:
-            plt.savefig(filepath, format="pdf")
+            plt.savefig(filepath, format="eps")
         plt.show()
 
         return None
@@ -176,15 +181,18 @@ class RandomCliqueCrossClique:
         _, axs = plt.subplots(nrows=1, ncols=3, figsize=(60, 20))
         for time in range(3):
             graph = nx.from_numpy_array(self.connectivity_matrix[time])
+            # Remove self loops from the figure for improved readability
+            graph.remove_edges_from(nx.selfloop_edges(graph))
 
             if time == 0:
                 pos = nx.spring_layout(graph)
 
             nx.draw(
                 graph,
-                with_labels=False,
+                with_labels=True,
                 node_color=[color_dict[label] for label in labels],
-                node_size=np.ones(self.num_members * self.num_clusters) * 500,
+                font_size=35,
+                node_size=np.ones(self.num_members * self.num_clusters) * 2000,
                 pos=pos,
                 ax=axs[time % 3],
             )
@@ -192,7 +200,7 @@ class RandomCliqueCrossClique:
 
         plt.tight_layout()
         if filepath is not None:
-            plt.savefig(filepath, format="pdf")
+            plt.savefig(filepath, format="eps")
         plt.show()
 
         return None

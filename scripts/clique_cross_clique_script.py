@@ -31,10 +31,11 @@ CXC2 = RandomCliqueCrossClique(
 CXC1.create_clique_cross_clique()
 CXC2.create_clique_cross_clique()
 
-FILEPATH_1 = "STGKM_Figures/clique_cross_clique.pdf"
-FILEPATH_2 = "STGKM_Figures/random_clique_cross_clique.pdf"
+FILEPATH_1 = "STGKM_Figures/clique_cross_clique.eps"
+FILEPATH_2 = "STGKM_Figures/random_clique_cross_clique.eps"
 CXC1.plot_clique_cross_clique(filepath=FILEPATH_1)
 CXC2.plot_clique_cross_clique(filepath=FILEPATH_2)
+
 
 ## Compare expectations for a pair of nodes at a specific time
 results = CXC2.compare_expectations(

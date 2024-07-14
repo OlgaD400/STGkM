@@ -9,7 +9,7 @@ import kmedoids
 import matplotlib.pyplot as plt
 from DCDID1.run_DCDID import run_dcdid, convert_labels
 from stgkm.helper_functions import run_stgkm
-from stgkm.STGKM import agglomerative_clustering
+from stgkm.helper_functions import agglomerative_clustering
 
 
 def static_kmedoids(connectivity_matrix: np.ndarray, num_clusters: int) -> np.ndarray:

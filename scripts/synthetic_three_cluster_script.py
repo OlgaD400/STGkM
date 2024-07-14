@@ -7,7 +7,7 @@ from stgkm.stgkm_figures import (
     three_snapshots_dynamic_clustering,
     choosing_num_clusters_plot,
 )
-from stgkm.STGKM import agglomerative_clustering
+from stgkm.helper_functions import agglomerative_clustering
 from stgkm.synthetic_graphs import ThreeClusterConnectivity
 
 from stgkm.helper_functions import choose_num_clusters

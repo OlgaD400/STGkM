@@ -2,9 +2,61 @@
 
 import numpy as np
 import kmedoids
+from typing import Callable
 from stgkm.STGKM import STGKM
 from stgkm.distance_functions import s_journey
-from stgkm.STGKM import agglomerative_clustering
+from sklearn.cluster import AgglomerativeClustering
+
+
+def similarity_measure(vector_1: np.ndarray, vector_2: np.ndarray) -> float:
+    """
+    Calculate similarity between two vectors. Takes into account order of elements in arrays.
+
+    Args:
+        vector_1 (np.array): Vector
+        vector_2 (np.array): Vector
+    Returns:
+        float: similarity measure
+    """
+    assert len(vector_1) == len(vector_2), "Vectors must be same length."
+    # return 1 - np.linalg.norm(x-y, 0)/len(x)
+    return np.sum(vector_1 == vector_2) / len(vector_1)
+
+
+def similarity_matrix(weights: np.ndarray, similarity_function: Callable) -> np.ndarray:
+    """
+    Return similarity matrix where entry i,j contains the similarity of point
+    assignment histories i and j.
+
+    Args:
+        weights (np.array): Point assignment histories.
+        similarity_function (function): Function that defines the similarity
+        measure between two arrays.
+    Returns:
+        sim_mat (np.array): Similarity matrix.
+    """
+    if len(weights.shape) == 3:
+        assignments = np.argmax(weights, axis=2).T
+    elif len(weights.shape) == 2:
+        assignments = weights
+    sim_mat = pairwise_distances(assignments, metric=similarity_function)
+
+    return sim_mat
+
+
+def agglomerative_clustering(
+    weights: np.ndarray,
+    num_clusters: int,
+    similarity_function: Callable = similarity_measure,
+):
+    """Find final long term cluster labels using agglomerative clustering"""
+    criteria_mat = similarity_matrix(weights, similarity_function=similarity_function)
+    model = AgglomerativeClustering(
+        n_clusters=num_clusters, linkage="average", metric="precomputed"
+    )
+    model.fit(1 - criteria_mat)
+
+    return model.labels_
 
 
 def penalize_distance(distance_matrix: np.ndarray, penalty: float) -> np.ndarray:
